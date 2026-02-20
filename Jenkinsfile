@@ -5,7 +5,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/SujalKishore/loginpage.git'
             }
         }
 
@@ -17,15 +17,15 @@ pipeline {
 
         stage('Build & Deploy') {
             steps {
-                bat 'docker-compose down || exit 0'
-                bat 'docker-compose up -d --build'
+                bat 'docker compose down || exit /b 0'
+                bat 'docker compose up -d --build'
             }
         }
 
         stage('Health Check') {
             steps {
-                bat 'ping 127.0.0.1 -n 11 > nul'
-                bat 'curl -f http://localhost:3000/health || exit 1'
+                sleep time: 20, unit: 'SECONDS'
+                bat 'powershell -Command "try { Invoke-WebRequest http://localhost:3000 -UseBasicParsing } catch { exit 1 }"'
             }
         }
     }
